@@ -1,0 +1,17 @@
+base
+ggplot2
+bindrcpp
+tidyr
+rsample
+lattice
+caret
+tidyverse
+tibble
+readr
+purrr
+dplyr
+stringr
+forcats
+recipes
+knitr
+kableExtra

@@ -13,28 +13,27 @@ in this training:
 **Day
 1**
 
-| Topic                                                                                                       |     Time      |
-| :---------------------------------------------------------------------------------------------------------- | :-----------: |
-| [Getting started](https://koalaverse.github.io/AnalyticsSummit19/01-intro.html)                             |  9:30 - 9:15  |
-| [Supervised modeling process](https://uc-r.github.io/Advanced-R/03-supervised-modeling-process.html)        | 9:30 - 10:30  |
-| [Feature & target engineering](https://uc-r.github.io/Advanced-R/04-engineering.html)                       | 10:45 - 11:45 |
-| Lunch                                                                                                       | 12:00 - 1:00  |
-| [Regression & cousins](https://uc-r.github.io/Advanced-R/05-regression.html)                                |  1:00 - 2:30  |
-| [Interpretable machine learning](https://bradleyboehmke.github.io/CinDay-RUG-IML-2018/slides-source.html#1) |  2:45 - 4:15  |
-| Q\&A                                                                                                        |  4:15 - 5:00  |
+| Topic                                                                                                             |     Time      |
+| :---------------------------------------------------------------------------------------------------------------- | :-----------: |
+| [Getting started](https://koalaverse.github.io/AnalyticsSummit19/01-intro.html)                                   |  9:30 - 9:15  |
+| [Supervised modeling process](https://koalaverse.github.io/AnalyticsSummit19/02-supervised-modeling-process.html) | 9:30 - 10:30  |
+| [Feature & target engineering](https://koalaverse.github.io/AnalyticsSummit19/03-engineering.html)                | 10:45 - 11:45 |
+| Lunch                                                                                                             | 12:00 - 1:00  |
+| [Regression & cousins](https://uc-r.github.io/Advanced-R/05-regression.html)                                      |  1:00 - 2:30  |
+| [Interpretable machine learning](https://bradleyboehmke.github.io/CinDay-RUG-IML-2018/slides-source.html#1)       |  2:45 - 4:15  |
+| Q\&A                                                                                                              |  4:15 - 5:00  |
 
-**Day
-2**
+**Day 2**
 
-| Topic                                                                                                |     Time     |
-| :--------------------------------------------------------------------------------------------------- | :----------: |
-| Recap & morning discussion                                                                           | 8:30 - 9:00  |
-| [Tree-based methods](https://uc-r.github.io/Advanced-R/06-random-forest.html)                        | 9:00 - 12:00 |
-| Lunch                                                                                                | 12:00 - 1:00 |
-| [Support vector machines](https://bradleyboehmke.github.io/CinDay-RUG-IML-2018/slides-source.html#1) | 1:00 - 2:30  |
-| [Stacked models & auto ML](https://uc-r.github.io/Advanced-R/08-stacking.html)                       | 2:45 - 3:15  |
-| Kaggle competition                                                                                   | 3:30 - 4:30  |
-| Q\&A                                                                                                 | 4:30 - 5:00  |
+| Topic                        |     Time     |
+| :--------------------------- | :----------: |
+| Recap & morning discussion   | 8:30 - 9:00  |
+| [Tree-based methods]()       | 9:00 - 12:00 |
+| Lunch                        | 12:00 - 1:00 |
+| [Support vector machines]()  | 1:00 - 2:30  |
+| [Stacked models & auto ML]() | 2:45 - 3:15  |
+| Kaggle competition           | 3:30 - 4:30  |
+| Q\&A                         | 4:30 - 5:00  |
 
 ***Schedule is still being refined and is subject to change; however,
 the topics should remain the same.***
