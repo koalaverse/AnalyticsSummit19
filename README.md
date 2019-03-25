@@ -15,7 +15,7 @@ in this training:
 
 | Topic                                                                                                       |     Time      |
 | :---------------------------------------------------------------------------------------------------------- | :-----------: |
-| [Getting started](https://uc-r.github.io/Advanced-R/01-intro.html)                                          |  9:30 - 9:15  |
+| [Getting started](https://koalaverse.github.io/AnalyticsSummit19/01-intro.html)                             |  9:30 - 9:15  |
 | [Supervised modeling process](https://uc-r.github.io/Advanced-R/03-supervised-modeling-process.html)        | 9:30 - 10:30  |
 | [Feature & target engineering](https://uc-r.github.io/Advanced-R/04-engineering.html)                       | 10:45 - 11:45 |
 | Lunch                                                                                                       | 12:00 - 1:00  |
@@ -44,8 +44,10 @@ the topics should remain the same.***
 To prepare for this course please complete the following ***prior*** to
 the day of class:
 
-1.  Download the student material [here](). This will provide you with
-    the R scripts and notebooks to follow along during class.
+1.  Download the student material
+    [here](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/koalaverse/AnalyticsSummit19/tree/master/student-scripts).
+    This will provide you with the R scripts and notebooks to follow
+    along during class.
 
 2.  After downloading the files, open the `00-run-this-script-first.R`
     and run the code. This will make sure you have all required packages

@@ -7,8 +7,6 @@ list_of_pkgs <- c(
   "AmesHousing",   # provides data we'll use
   "tidyverse",     # data munging & visualization
   "reshape2",      # data transformation for one example
-  "extracat",      # visualizing missing data (one example)
-  "cluster",       # clustering techniques
   "factoextra",    # clustering & PCA visualizations
   "rsample",       # sampling procedures
   "recipes",       # feature engineering procedures
