@@ -1,7 +1,7 @@
 ---
 title: "Random Forests and Gradient Boosting Machines"
 author: "Bradley C. Boehmke </br> and </br> Brandon M. Greenwell"
-date: "May 15, 2018"
+date: "April 2, 2019"
 output:
   xaringan::moon_reader:
     css: ["default", "scrollable.css"]
@@ -160,7 +160,7 @@ Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/Forest#/med
 
 ## Mushroom classification
 
-There is no simple rule for determining the edibility of a [mushroom](https://raw.githubusercontent.com/bgreenwell/MLDay18/master/data/mushroom.csv); no rules like **"leaflets three, let it be"**, **"hairy vine, no friend of mine"** and **"berries white, run in fright"** for poison ivy.
+There is no simple rule for determining the edibility of a [mushroom](https://raw.githubusercontent.com/bgreenwell/MLDay18/master/docs/data/mushroom.csv); no rules like **"leaflets three, let it be"**, **"hairy vine, no friend of mine"** and **"berries white, run in fright"** for poison ivy.
 
 ```{r, echo=FALSE, out.width="50%"}
 knitr::include_graphics("Images/edible.jpg")
@@ -170,7 +170,7 @@ knitr::include_graphics("Images/edible.jpg")
 
 ```{r mushroom-load, echo=TRUE}
 path <- paste0("https://raw.githubusercontent.com/bgreenwell/",
-               "MLDay18/master/data/mushroom.csv")
+               "MLDay18/master/docs/data/mushroom.csv")
 mushroom <- read.csv(path)  # load the data from GitHub
 mushroom$veil.type <- NULL  # only takes on a single value  #<<
 ```
@@ -704,6 +704,7 @@ circle <- as.data.frame(mlbench::mlbench.circle(
 names(circle) <- c("x1", "x2", "y")  # rename columns
 
 # Plot decision boundary: CART
+dark2 <- RColorBrewer::brewer.pal(8, "Dark2")
 plot(
   formula = x2 ~ x1, 
   data = circle, 
@@ -1277,7 +1278,7 @@ devtools::install_github("bgreenwell/pdp")
 ```
 
 ```{r, echo=FALSE, out.width="65%"}
-knitr::include_graphics("Images/pdp-logo.png")
+knitr::include_graphics("Images/pdp-logo-trees.png")
 ```
 
 ]
@@ -1292,10 +1293,10 @@ knitr::include_graphics("Images/pdp-logo.png")
 library(pdp)
 
 # PDPs for the top two predictors
-p1 <- partial(boston_ranger, pred.var = "lstat", plot = TRUE)
-p2 <- partial(boston_ranger, pred.var = "rm", plot = TRUE)
-p3 <- partial(boston_ranger, pred.var = c("lstat", "rm"),  #<<
-              chull = TRUE, plot = TRUE)                   #<<
+p1 <- pdp::partial(boston_ranger, pred.var = "lstat", plot = TRUE)
+p2 <- pdp::partial(boston_ranger, pred.var = "rm", plot = TRUE)
+p3 <- pdp::partial(boston_ranger, pred.var = c("lstat", "rm"),  #<<
+                   chull = TRUE, plot = TRUE)                   #<<
 grid.arrange(p1, p2, p3, ncol = 3)
 ```
 
@@ -1322,7 +1323,7 @@ p2 <- autoplot(pd)
 ```{r ice-curves, echo=TRUE}
 # ICE and c-ICE curves
 p3 <- boston_ranger %>%  # %>% is automatically imported!
-  partial(pred.var = "rm", ice = TRUE, center = TRUE) %>%
+  pdp::partial(pred.var = "rm", ice = TRUE, center = TRUE) %>%
   autoplot(alpha = 0.1)
 ```
 
@@ -1753,7 +1754,7 @@ best_iter <- gbm.perf(
 ### Brute force method:
 ```{r randomForest-pdp-timing}
 system.time(
-  pd1 <- partial(
+  pd1 <- pdp::partial(
     boston_gbm, 
     pred.var = c("lon", "nox"),
     recursive = FALSE,  #<<
@@ -1770,7 +1771,7 @@ system.time(
 ### Recursive method:
 ```{r gbm-pdp-timing}
 system.time(
-  pd2 <- partial(
+  pd2 <- pdp::partial(
     boston_gbm, 
     pred.var = c("lon", "nox"),
     recursive = TRUE,  #<<
@@ -1929,10 +1930,10 @@ vip(ames_xgb, feature_names = colnames(X), type = "Gain",
 
 ```{r xgboost-pdp, fig.width=12, fig.height=4}
 # Partial dependence plots
-oq_ice <- partial(ames_xgb, pred.var = "Overall_Qual", ice = TRUE, 
-                  center = TRUE, train = X)
-p4 <- autoplot(partial(ames_xgb, pred.var = "Gr_Liv_Area", train = X))
-p5 <- autoplot(partial(ames_xgb, pred.var = "Garage_Cars", train = X))
+oq_ice <- pdp::partial(ames_xgb, pred.var = "Overall_Qual", ice = TRUE, 
+                       center = TRUE, train = X)
+p4 <- autoplot(pdp::partial(ames_xgb, pred.var = "Gr_Liv_Area", train = X))
+p5 <- autoplot(pdp::partial(ames_xgb, pred.var = "Garage_Cars", train = X))
 p6 <- autoplot(oq_ice, alpha = 0.1)
 grid.arrange(p4, p5, p6, ncol = 3)
 ```
@@ -1948,7 +1949,7 @@ grid.arrange(p4, p5, p6, ncol = 3)
 ames_vi <- vi(ames_xgb, feature_names = colnames(X), type = "Gain")
 feats <- c(head(ames_vi, n = 3)$Variable, tail(ames_vi, n = 3)$Variable)
 pds <- lapply(feats, FUN = function(x) {
-  pd <- cbind(x, partial(ames_xgb, pred.var = x, train = X))
+  pd <- cbind(x, pdp::partial(ames_xgb, pred.var = x, train = X))
   names(pd) <- c("xvar", "xval", "yhat")
   pd
 })
@@ -2012,5 +2013,5 @@ ggplot(pds, aes(x = xval, y = yhat)) +
 ## Questions?
 
 ```{r, echo=FALSE, out.width="100%"}
-knitr::include_graphics("Images/questions.png")
+knitr::include_graphics("Images/questions-trees.png")
 ```

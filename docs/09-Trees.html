@@ -4,7 +4,7 @@
     <title>Random Forests and Gradient Boosting Machines</title>
     <meta charset="utf-8">
     <meta name="author" content="Bradley C. Boehmke  and  Brandon M. Greenwell" />
-    <meta name="date" content="2018-05-15" />
+    <meta name="date" content="2019-04-02" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="scrollable.css" type="text/css" />
   </head>
@@ -14,7 +14,7 @@ class: center, middle, inverse, title-slide
 
 # Random Forests and Gradient Boosting Machines
 ### Bradley C. Boehmke </br> and </br> Brandon M. Greenwell
-### May 15, 2018
+### April 2, 2019
 
 ---
 
@@ -145,7 +145,7 @@ Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/Forest#/med
 
 ## Mushroom classification
 
-There is no simple rule for determining the edibility of a [mushroom](https://raw.githubusercontent.com/bgreenwell/MLDay18/master/data/mushroom.csv); no rules like **"leaflets three, let it be"**, **"hairy vine, no friend of mine"** and **"berries white, run in fright"** for poison ivy.
+There is no simple rule for determining the edibility of a [mushroom](https://raw.githubusercontent.com/bgreenwell/MLDay18/master/docs/data/mushroom.csv); no rules like **"leaflets three, let it be"**, **"hairy vine, no friend of mine"** and **"berries white, run in fright"** for poison ivy.
 
 &lt;img src="Images/edible.jpg" width="50%" style="display: block; margin: auto;" /&gt;
 
@@ -154,7 +154,7 @@ There is no simple rule for determining the edibility of a [mushroom](https://ra
 
 ```r
 path &lt;- paste0("https://raw.githubusercontent.com/bgreenwell/",
-               "MLDay18/master/data/mushroom.csv")
+               "MLDay18/master/docs/data/mushroom.csv")
 mushroom &lt;- read.csv(path)  # load the data from GitHub
 *mushroom$veil.type &lt;- NULL  # only takes on a single value
 ```
@@ -257,14 +257,14 @@ accuracy(
 .pull-left[
 
 Decision stump (test error = 1.53%):
-&lt;img src="figures/mushroom-tree-diagram-1-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/mushroom-tree-diagram-1-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 ]
 
 .pull-right[
 
 Optimal tree (test error = 0%):
-&lt;img src="figures/mushroom-tree-diagram-2-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/mushroom-tree-diagram-2-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -337,7 +337,7 @@ legend("bottomright", legend = c("Train", "Test"), bty = "n",
 ---
 class: center, middle
 
-&lt;img src="figures/mushroom-cart-roc-02-1.svg" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/mushroom-cart-roc-02-1.svg" width="80%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -400,7 +400,7 @@ pred &lt;- predict(spam_tree, newdata = xtst, type = "class")
 
 .scrollable[
 
-&lt;img src="figures/spam-tree-diagram-1.svg" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/spam-tree-diagram-1.svg" width="70%" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -431,7 +431,7 @@ pred &lt;- predict(spam_tree, newdata = xtst, type = "class")
 ##  8 all                  127. 
 ##  9 capitalTotal         108. 
 ## 10 hp                    74.3
-## # ... with 38 more rows
+## # … with 38 more rows
 ```
 
 ]
@@ -444,7 +444,7 @@ pred &lt;- predict(spam_tree, newdata = xtst, type = "class")
 *vip::vip(spam_tree, num_features = 10)
 ```
 
-&lt;img src="figures/spam-vip-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/spam-vip-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -571,28 +571,28 @@ Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/Forest#/med
 
 ## Bagging trees
 
-&lt;img src="figures/bagging-1-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/bagging-1-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
 
 
 ---
 
 ## Trees are step functions
 
-&lt;img src="figures/bagging-2-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/bagging-2-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
 
 
 ---
 
 ## Trees are noisy
 
-&lt;img src="figures/bagging-3-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/bagging-3-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
 
 
 ---
 
 ## Bagging reduces variance
 
-&lt;img src="figures/bagging-4-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/bagging-4-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -600,13 +600,13 @@ class: center, middle
 
 .large[Remember this data set?]
 
-&lt;img src="figures/circle-01-1.svg" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/circle-01-1.svg" width="70%" style="display: block; margin: auto;" /&gt;
 
 
 ---
 class: center, middle
 
-&lt;img src="figures/circle-02-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/circle-02-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -637,7 +637,7 @@ spam_bag &lt;- randomForest(
 
 .pull-right[
 
-&lt;img src="figures/unnamed-chunk-3-1.svg" width="400" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/unnamed-chunk-3-1.svg" width="400" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -772,7 +772,7 @@ spam_rf &lt;- randomForest(
 
 .pull-right[
 
-&lt;img src="figures/unnamed-chunk-5-1.svg" width="400" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/unnamed-chunk-5-1.svg" width="400" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -851,7 +851,7 @@ mean(x %in% sample(x, replace = TRUE))  # non-OOB proportion
 
 ## Predicting email spam
 
-&lt;img src="figures/unnamed-chunk-6-1.svg" width="60%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/unnamed-chunk-6-1.svg" width="60%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -923,7 +923,7 @@ system.time(
 
 ```
 ##    user  system elapsed 
-##   7.408   0.164   7.715
+##   6.640   0.133   6.773
 ```
 
 ```
@@ -950,7 +950,7 @@ system.time(
 
 ```
 ##    user  system elapsed 
-##   6.224   0.158   1.997
+##   6.809   0.228   1.112
 ```
 
 ```
@@ -1000,7 +1000,7 @@ par(mfrow = c(1, 2))  # side-by-side plots
 *varImpPlot(boston_rf)  # randomForest::varImpPlot()
 ```
 
-&lt;img src="figures/boston-rf-varImpPlot-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/boston-rf-varImpPlot-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1017,7 +1017,7 @@ p3 &lt;- vip(boston_ranger) + ggtitle("ranger")
 *grid.arrange(p1, p2, p3, ncol = 3)
 ```
 
-&lt;img src="figures/boston-rf-vip-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/boston-rf-vip-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1074,7 +1074,7 @@ install.packages("pdp")
 devtools::install_github("bgreenwell/pdp")
 ```
 
-&lt;img src="Images/pdp-logo.png" width="65%" style="display: block; margin: auto;" /&gt;
+&lt;img src="Images/pdp-logo-trees.png" width="65%" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -1089,14 +1089,14 @@ devtools::install_github("bgreenwell/pdp")
 library(pdp)
 
 # PDPs for the top two predictors
-p1 &lt;- partial(boston_ranger, pred.var = "lstat", plot = TRUE)
-p2 &lt;- partial(boston_ranger, pred.var = "rm", plot = TRUE)
-*p3 &lt;- partial(boston_ranger, pred.var = c("lstat", "rm"),
-*             chull = TRUE, plot = TRUE)
+p1 &lt;- pdp::partial(boston_ranger, pred.var = "lstat", plot = TRUE)
+p2 &lt;- pdp::partial(boston_ranger, pred.var = "rm", plot = TRUE)
+*p3 &lt;- pdp::partial(boston_ranger, pred.var = c("lstat", "rm"),
+*                  chull = TRUE, plot = TRUE)
 grid.arrange(p1, p2, p3, ncol = 3)
 ```
 
-&lt;img src="figures/boston-rf-pdps-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/boston-rf-pdps-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1124,7 +1124,7 @@ p2 &lt;- autoplot(pd)
 ```r
 # ICE and c-ICE curves
 p3 &lt;- boston_ranger %&gt;%  # %&gt;% is automatically imported!
-  partial(pred.var = "rm", ice = TRUE, center = TRUE) %&gt;%
+  pdp::partial(pred.var = "rm", ice = TRUE, center = TRUE) %&gt;%
   autoplot(alpha = 0.1)
 ```
 
@@ -1139,7 +1139,7 @@ p3 &lt;- boston_ranger %&gt;%  # %&gt;% is automatically imported!
 grid.arrange(p1, p2, p3, ncol = 3)
 ```
 
-&lt;img src="figures/unnamed-chunk-12-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/unnamed-chunk-12-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1151,7 +1151,7 @@ grid.arrange(p1, p2, p3, ncol = 3)
 
 ---
 
-&lt;img src="figures/mushroom-tree-diagram-3-1.svg" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/mushroom-tree-diagram-3-1.svg" width="80%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1213,7 +1213,7 @@ banknote_rf$confusion
 heatmap(1 - banknote_rf$proximity, col = viridis::plasma(256))
 ```
 
-&lt;img src="figures/heatmap-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/heatmap-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1244,7 +1244,7 @@ ggplot(outlyingness, aes(x = obs, y = out)) +
 
 .pull-right[
 
-&lt;img src="figures/outlier-plot-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/outlier-plot-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -1259,7 +1259,7 @@ ggplot(outlyingness, aes(x = obs, y = out)) +
 MDSplot(banknote_rf, fac = as.factor(banknote$Y), k = 2, cex = 1.5)
 ```
 
-&lt;img src="figures/MDS-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/MDS-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1372,7 +1372,7 @@ attr_rf  # test error ~ 16.36%
 vip(attr_rf)
 ```
 
-&lt;img src="figures/attrition-rf-01-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/attrition-rf-01-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -1563,7 +1563,7 @@ best_iter &lt;- gbm.perf(
 )
 ```
 
-&lt;img src="figures/boston_gbm_best-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/boston_gbm_best-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1576,7 +1576,7 @@ best_iter &lt;- gbm.perf(
 
 ```r
 system.time(
-  pd1 &lt;- partial(
+  pd1 &lt;- pdp::partial(
     boston_gbm, 
     pred.var = c("lon", "nox"),
 *   recursive = FALSE,
@@ -1588,7 +1588,7 @@ system.time(
 
 ```
 ##    user  system elapsed 
-## 111.028   0.285 111.732
+## 111.068   0.280 111.523
 ```
 
 ]
@@ -1599,7 +1599,7 @@ system.time(
 
 ```r
 system.time(
-  pd2 &lt;- partial(
+  pd2 &lt;- pdp::partial(
     boston_gbm, 
     pred.var = c("lon", "nox"),
 *   recursive = TRUE,
@@ -1611,7 +1611,7 @@ system.time(
 
 ```
 ##    user  system elapsed 
-##   0.453   0.004   0.462
+##   0.448   0.001   0.450
 ```
 
 ]
@@ -1627,7 +1627,7 @@ system.time(
 grid.arrange(autoplot(pd1), autoplot(pd2), ncol = 2)
 ```
 
-&lt;img src="figures/boston-pdps-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/boston-pdps-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1658,7 +1658,7 @@ ggplot(ames, aes(x = Sale_Price, y = Overall_Qual)) +
   theme_light() + theme(legend.position = "none")
 ```
 
-&lt;img src="figures/ames-densities-1.svg" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/ames-densities-1.svg" width="70%" style="display: block; margin: auto;" /&gt;
 
 **Source:** [Bradley Boehmke](https://github.com/bradleyboehmke)
 
@@ -1700,7 +1700,7 @@ ames_xgb_cv &lt;- xgb.cv(
 
 ---
 
-&lt;img src="figures/ames-xgboost-cv-plot-1.svg" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/ames-xgboost-cv-plot-1.svg" width="80%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1745,7 +1745,7 @@ p3 &lt;- vip(ames_xgb, feature_names = colnames(X), type = "Frequency")
 grid.arrange(p1, p2, p3, ncol = 3)
 ```
 
-&lt;img src="figures/xgboost-vip-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/xgboost-vip-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1759,7 +1759,7 @@ vip(ames_xgb, feature_names = colnames(X), type = "Gain",
     num_features = nrow(X), bar = FALSE)
 ```
 
-&lt;img src="figures/xgboost-vip-2-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/xgboost-vip-2-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1769,15 +1769,15 @@ vip(ames_xgb, feature_names = colnames(X), type = "Gain",
 
 ```r
 # Partial dependence plots
-oq_ice &lt;- partial(ames_xgb, pred.var = "Overall_Qual", ice = TRUE, 
-                  center = TRUE, train = X)
-p4 &lt;- autoplot(partial(ames_xgb, pred.var = "Gr_Liv_Area", train = X))
-p5 &lt;- autoplot(partial(ames_xgb, pred.var = "Garage_Cars", train = X))
+oq_ice &lt;- pdp::partial(ames_xgb, pred.var = "Overall_Qual", ice = TRUE, 
+                       center = TRUE, train = X)
+p4 &lt;- autoplot(pdp::partial(ames_xgb, pred.var = "Gr_Liv_Area", train = X))
+p5 &lt;- autoplot(pdp::partial(ames_xgb, pred.var = "Garage_Cars", train = X))
 p6 &lt;- autoplot(oq_ice, alpha = 0.1)
 grid.arrange(p4, p5, p6, ncol = 3)
 ```
 
-&lt;img src="figures/xgboost-pdp-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/xgboost-pdp-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1785,7 +1785,7 @@ grid.arrange(p4, p5, p6, ncol = 3)
 ## Ames housing data
 
 
-&lt;img src="figures/xgboost-pdp-vi-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="09-Trees_files/figure-html/xgboost-pdp-vi-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1837,7 +1837,7 @@ grid.arrange(p4, p5, p6, ncol = 3)
 
 ## Questions?
 
-&lt;img src="Images/questions.png" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="Images/questions-trees.png" width="100%" style="display: block; margin: auto;" /&gt;
     </textarea>
 <script src="libs/remark-latest.min.js"></script>
 <script src="macros.js"></script>
@@ -1901,19 +1901,30 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   });
 })(60000);</script>
 
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  tex2jax: {
-    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
   }
-});
+})();
 </script>
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
 (function () {
   var script = document.createElement('script');
   script.type = 'text/javascript';
-  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
   if (location.protocol !== 'file:' && /^https?:/.test(script.src))
     script.src  = script.src.replace(/^https?:/, '');
   document.getElementsByTagName('head')[0].appendChild(script);
