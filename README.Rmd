@@ -14,7 +14,7 @@ Welcome to Machine Learning with R\! This short course provides a hands-on appro
 | Topic                                 |     Time      |
 | :------------------------------------ | :-----------: |
 | [Getting started](https://koalaverse.github.io/AnalyticsSummit19/01-intro.html) |  9:30 - 9:15  |
-| [Supervised modeling process](https://uc-r.github.io/Advanced-R/03-supervised-modeling-process.html) | 9:30 - 10:30 |
+| [Supervised modeling process](https://koalaverse.github.io/AnalyticsSummit19/02-supervised-modeling-process.html) | 9:30 - 10:30 |
 | [Feature & target engineering](https://uc-r.github.io/Advanced-R/04-engineering.html) |  10:45 - 11:45  |
 | Lunch                                 | 12:00 - 1:00  |
 | [Regression & cousins](https://uc-r.github.io/Advanced-R/05-regression.html) |  1:00 - 2:30  |
