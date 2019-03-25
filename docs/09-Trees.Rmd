@@ -163,7 +163,7 @@ Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/Forest#/med
 There is no simple rule for determining the edibility of a [mushroom](https://raw.githubusercontent.com/bgreenwell/MLDay18/master/docs/data/mushroom.csv); no rules like **"leaflets three, let it be"**, **"hairy vine, no friend of mine"** and **"berries white, run in fright"** for poison ivy.
 
 ```{r, echo=FALSE, out.width="50%"}
-knitr::include_graphics("Images/edible.jpg")
+knitr::include_graphics("images/edible.jpg")
 ```
 
 --
@@ -412,7 +412,7 @@ legend("bottomright", legend = c("Train", "Test"), bty = "n",
 .pull-right[
 
 ```{r fig-spam-300, echo=FALSE, out.width="100%"}
-knitr::include_graphics("Images/this-is-spam.jpg")
+knitr::include_graphics("images/this-is-spam.jpg")
 ```
 
 ]
@@ -535,7 +535,7 @@ vip::vip(spam_tree, num_features = 10)  #<<
 ## How do trees measure up?
 
 ```{r fig-characteristics, echo=FALSE, out.width="65%"}
-knitr::include_graphics("Images/esl-tbl.png")
+knitr::include_graphics("images/esl-tbl.png")
 ```
 <br>
 .center[**Source:** The Elements of Statistical Learning, Second Edition]
@@ -600,7 +600,7 @@ Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/Forest#/med
 .pull-right[
 
 ```{r fig-bagged-trees, echo=FALSE, out.width="80%"}
-knitr::include_graphics("Images/millionaire.png")
+knitr::include_graphics("images/millionaire.png")
 ```
 
 ]
@@ -1018,7 +1018,7 @@ legend("topright", c("Single tree", "Bagging", "Random forest"),
     - $m_{try}$ mitigates this issue to some extent
 
 ```{r fig-bells-and-whistles, echo=FALSE, out.width="80%"}
-knitr::include_graphics("Images/bells-and-whistles.jpg")
+knitr::include_graphics("images/bells-and-whistles.jpg")
 ```
 
 ]
@@ -1101,7 +1101,7 @@ legend("topright", c("Random forest (OOB)", "Random forest (test)"),
 * Harrison and Rubinfeld's housing value equation ( $R^2 = 0.81$ ):
 
 ```{r, echo=FALSE, out.width="80%"}
-knitr::include_graphics("Images/boston-eqn.png")
+knitr::include_graphics("images/boston-eqn.png")
 ```
 
 --
@@ -1197,7 +1197,7 @@ devtools::install_github("AFIT-R/vip")
 ```
 
 ```{r vip-badge, echo=FALSE, out.width="80%"}
-knitr::include_graphics("Images/vip-logo.svg")
+knitr::include_graphics("images/vip-logo.svg")
 ```
 ]
 
@@ -1278,7 +1278,7 @@ devtools::install_github("bgreenwell/pdp")
 ```
 
 ```{r, echo=FALSE, out.width="65%"}
-knitr::include_graphics("Images/pdp-logo-trees.png")
+knitr::include_graphics("images/pdp-logo-trees.png")
 ```
 
 ]
@@ -1675,7 +1675,7 @@ class: center, middle
     - Parallel tree boosting and GPU support!!
 
 ```{r gpu, echo=FALSE, out.width="50%"}
-knitr::include_graphics("Images/gpu.jpg")
+knitr::include_graphics("images/gpu.jpg")
 ```
 
 
@@ -2013,5 +2013,5 @@ ggplot(pds, aes(x = xval, y = yhat)) +
 ## Questions?
 
 ```{r, echo=FALSE, out.width="100%"}
-knitr::include_graphics("Images/questions-trees.png")
+knitr::include_graphics("images/questions-trees.png")
 ```
