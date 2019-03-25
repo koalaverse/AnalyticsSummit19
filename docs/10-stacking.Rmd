@@ -1,0 +1,804 @@
+---
+title: "Model Stacking & AutoML"
+author: "Brad Boehmke & Brandon Greenwell"
+date: "2019-04-02"
+output:
+  xaringan::moon_reader:
+    css: ["scrollable.css", "mtheme_max.css", "fonts_mtheme_max.css"]
+    self_contained: false
+    lib_dir: libs
+    chakra: libs/remark-latest.min.js
+    nature:
+      ratio: '16:9'
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+    seal: false  
+---
+
+```{r setup, include=FALSE, cache=FALSE}
+# Set global R options
+options(htmltools.dir.version = FALSE, servr.daemon = TRUE)
+
+# Set global knitr chunk options
+knitr::opts_chunk$set(
+  fig.align = "center", 
+  cache = TRUE,
+  error = FALSE,
+  message = FALSE, 
+  warning = FALSE, 
+  collapse = TRUE,
+  eval = FALSE
+)
+
+library(tidyverse)
+# set ggplot to black and white theme
+library(ggplot2)
+theme_set(theme_bw())
+```
+
+class: clear, center, middle
+
+background-image: url(images/stacking-icon.jpg)
+background-position: center
+background-size: cover
+
+<br><br><br>
+.font300.white[Model Stacking & AutoML]
+
+
+---
+# Introduction
+
+.pull-left[
+
+.center.bold.font120[Thoughts]
+
+- Original concept formalized by Leo Breiman [`r anicon::aia("google-scholar", animate = 'tada', anitype="hover")`](http://statistics.berkeley.edu/sites/default/files/tech-reports/367.pdf)
+
+- Theoretically formalized in 2007 as ___Super Learners___ [`r anicon::aia("google-scholar", animate = 'tada', anitype="hover")`](https://www.degruyter.com/view/j/sagmb.2007.6.issue-1/sagmb.2007.6.1.1309/sagmb.2007.6.1.1309.xml) where the authors...
+
+- proved that super learners will learn the optimal combination of supplied base learners and will typically perform as well as or better than any of the individual base learners.
+
+- Nearly all prediction competitions are won with super learners
+
+]
+
+--
+
+.pull-right[
+
+.center.bold.font120[Overview]
+
+- Basic idea
+
+- Stacking existing models
+
+- Stacking a grid search
+
+- Auto machine learning search
+
+]
+
+
+---
+# Prereqs .red[`r anicon::faa("hand-point-right", color = "red", animate = "horizontal")` code chunk 1]
+
+.scrollable90[
+.pull-left[
+
+.center.bold.font120[Packages]
+
+```{r prereqs-pks}
+library(recipes)
+library(h2o)
+h2o.init(max_mem_size = "5g")
+```
+
+```{r no-progress, echo=FALSE}
+h2o.no_progress()
+```
+
+]
+
+.pull-right[
+
+.center.bold.font120[Data]
+
+```{r prereqs-data}
+# ames data
+ames <- AmesHousing::make_ames()
+
+# split data
+set.seed(123)
+split <- rsample::initial_split(ames, strata = "Sale_Price")
+ames_train <- rsample::training(split)
+ames_test <- rsample::testing(split)
+
+# make sure we have consistent categorical levels
+blueprint <- recipe(Sale_Price ~ ., data = ames_train) %>%
+  step_other(all_nominal(), threshold = .005)
+
+# create training & test sets
+train_h2o <- prep(blueprint, training = ames_train, retain = TRUE) %>%
+  juice() %>%
+  as.h2o()
+
+test_h2o <- prep(blueprint, training = ames_train) %>%
+  bake(new_data = ames_test) %>%
+  as.h2o()
+
+# get names of response and features
+Y <- "Sale_Price"
+X <- setdiff(names(ames_train), Y)
+```
+]
+]
+
+---
+class: clear, center, middle, inverse
+
+.font300.white[Basic Idea]
+
+
+---
+# Common ensemble methods
+
+<br>
+.font110[
+* Ensemble machine learning methods use multiple learning algorithms to obtain better predictive performance than could be obtained from any of the constituent learning algorithms.
+
+* Combining multiple predictors is not new
+   - Bagging
+   - Random forests
+   - Gradient boosting
+   
+* However, these ensemble approaches combine common weak base learning algorithms (i.e. decision trees)  
+
+* Stacking, on the other hand, is designed to .bold.blue[ensemble a diverse group of strong learners.]
+]
+
+---
+# Super learner algorithm
+
+Part 1: Set up the ensemble
+- Specify a list of _L_ base learners (with a specific set of model parameters).
+- Specify a metalearning algorithm. Can be any one of the algorithms discussed in the previous chapters but most often is regularized regression.
+
+---
+# Super learner algorithm
+
+.opacity[Part 1: Set up the ensemble]
+
+Part 2: Train the ensemble
+- Train each of the _L_ base learners on the training set.
+- Perform k-fold cross-validation on each of these learners and collect the cross-validated predicted values from each of the _L_ algorithms (must use the same k-folds for each base learner). These predicted values represent  $p_1,…,p_L$.
+- The _N_ cross-validated predicted values from each of the _L_ algorithms can be combined to form a new $N \times L$ matrix (represented by _Z_). This matrix, along with the original response vector (_y_), is called the “level-one” data. (N = number of rows in the training set.)
+
+```{r stacking-eq, echo=FALSE, eval=TRUE}
+knitr::include_graphics("images/stacking-equation.png")
+```
+
+- Train the metalearning algorithm on the level-one data ( $y=f(Z)$ ). The “ensemble model” consists of the __L__ base learning models and the metalearning model, which can then be used to generate predictions on a test set.
+
+---
+# Super learner algorithm
+
+.opacity[Part 1: Set up the ensemble]
+
+.opacity[Part 2: Train the ensemble]
+
+Part 3: Predict on new data
+- To generate ensemble predictions, first generate predictions from the base learners.
+- Feed those predictions into the metalearner to generate the ensemble prediction.
+
+<br><br><br><br>
+--
+
+.center.bold.font90[_Stacking rarely does worse than selecting the single best base learner on the training data. .blue[The biggest gains are usually produced when stacking base learners that have high variability, and uncorrelated, predicted values.] The more similar the predicted values, the less advantage there is in stacking._]
+
+---
+# Package implementation `r emo::ji("package")`
+<br>
+.font110[
+* [h2o](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/stacked-ensembles.html): My go-to package for stacking and autoML. Provides three appraoches for model stacking.
+
+* [SuperLearner](https://github.com/ecpolley/SuperLearner): original implementation, works with `caret` and many other algorithm packages.  Worth exploring.
+
+* [subsemble](https://github.com/ledell/subsemble): developed by Erin Ledell who now is one of the developers of __h2o__. Maintained for backward compatibility but not forward development
+
+* [caretEnsemble](https://github.com/zachmayer/caretEnsemble): implements a boostrapped (rather than cross-validated) version of stacking. The bootstrapped version will train faster since bootrapping (with a train/test) is a fraction of the work as k-fold cross-validation, however the the ensemble performance suffers as a result of this shortcut.
+]
+
+---
+class: clear, center, middle, inverse
+
+.font300.white[Stacking Existing Models]  
+.white[_Train first, stack later_]
+
+---
+# Stacking existing models
+
+.pull-left.font90[
+Say we found the optimal hyperparameters that provided the best predictive accuracy for a:
+
+1. Regularized regression base learner
+2. Random forest base learner
+3. Stochastic GBM base learner
+4. XGBoost base learner
+
+To stack them later we need to do a few specific things:
+
+1. All models must be trained on the same training set.
+2. All models must be trained with the same number of CV folds.
+3. All models must use the same fold assignment to ensure the same observations are used (`fold_assignment = "Modulo"`).
+4. The cross-validated predictions from all of the models must be preserved (`keep_cross_validation_predictions = True`).
+
+]
+
+---
+# Stacking existing models
+
+.scrollable90[
+.pull-left.font90[
+Say we found the optimal hyperparameters that provided the best predictive accuracy for a:
+
+1. Regularized regression base learner
+2. Random forest base learner
+3. Stochastic GBM base learner
+4. XGBoost base learner
+
+To stack them later we need to do a few specific things:
+
+1. All models must be trained on the same training set.
+2. All models must be trained with the same number of CV folds.
+3. All models must use the same fold assignment to ensure the same observations are used (`fold_assignment = "Modulo"`).
+4. The cross-validated predictions from all of the models must be preserved (`keep_cross_validation_predictions = True`).
+
+]
+
+.pull-right[
+
+.center.bold.font90[`r anicon::faa("exclamation-triangle", color = "red", animate = FALSE)`  This code takes ~12 min `r anicon::faa("exclamation-triangle", color = "red", animate = FALSE)`]
+
+```{r existing-models, eval=FALSE}
+# Train & Cross-validate a GLM model
+best_glm <- h2o.glm(
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  alpha = .1,
+  remove_collinear_columns = TRUE,
+  nfolds = 10, #<<
+  fold_assignment = "Modulo", #<<
+  keep_cross_validation_predictions = TRUE, #<<
+  seed = 123
+  )
+
+h2o.rmse(best_glm, xval = TRUE)
+## [1] 35638.96
+
+# Train & Cross-validate a RF model
+best_rf <- h2o.randomForest(
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  ntrees = 1000,
+  mtries = 20,
+  max_depth = 30,
+  min_rows = 1,
+  sample_rate = 0.8,
+  nfolds = 10, #<<
+  fold_assignment = "Modulo", #<<
+  keep_cross_validation_predictions = TRUE, #<<
+  seed = 123,
+  stopping_rounds = 50,
+  stopping_metric = "RMSE",
+  stopping_tolerance = 0
+  )
+
+h2o.rmse(best_rf, xval = TRUE)
+## [1] 24103.8
+
+# Train & Cross-validate a GBM model
+best_gbm <- h2o.gbm(
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  ntrees = 5000,
+  learn_rate = 0.01,
+  max_depth = 7,
+  min_rows = 5,
+  sample_rate = 0.8,
+  nfolds = 10, #<<
+  fold_assignment = "Modulo", #<<
+  keep_cross_validation_predictions = TRUE, #<<
+  seed = 123,
+  stopping_rounds = 50,
+  stopping_metric = "RMSE",
+  stopping_tolerance = 0
+  )
+
+h2o.rmse(best_gbm, xval = TRUE)
+## [1] 21747.52
+
+# Train & Cross-validate an XGBoost model
+best_xgb <- h2o.xgboost(
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  ntrees = 5000,
+  learn_rate = 0.05,
+  max_depth = 3,
+  min_rows = 3,
+  sample_rate = 0.8,
+  categorical_encoding = "Enum",
+  nfolds = 10, #<<
+  fold_assignment = "Modulo", #<<
+  keep_cross_validation_predictions = TRUE, #<<
+  seed = 123,
+  stopping_rounds = 50,
+  stopping_metric = "RMSE",
+  stopping_tolerance = 0
+)
+
+h2o.rmse(best_xgb, xval = TRUE)
+## [1] 20936.64
+```
+]
+]
+
+---
+# Stacking existing models
+
+.pull-left[
+
+* use `h2o.stackedEnsemble()` to stack these models
+
+* we can use many different metalearning algorithms ("superlearners")
+   - `glm`: regularized linear regression
+   - `drf`: random forest
+   - `gbm`: gradient boosted machine
+   - `deeplearning`: neural network
+
+]
+
+.pull-right[
+
+```{r stacking-existing-mods, eval=FALSE}
+# Train a stacked tree ensemble
+ensemble_tree <- h2o.stackedEnsemble(
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  model_id = "my_tree_ensemble",
+  base_models = list(best_glm, best_rf, best_gbm, best_xgb),
+  metalearner_algorithm = "drf" #<<
+  )
+```
+
+]
+
+---
+# Stacking existing models
+
+.scrollable90[
+.pull-left[
+
+* use `h2o.stackedEnsemble()` to stack these models
+
+* we can use many different metalearning algorithms ("superlearners")
+   - `glm`: regularized linear regression
+   - `drf`: random forest
+   - `gbm`: gradient boosted machine
+   - `deeplearning`: neural network
+   
+* results illustrate a slight improvement
+
+* we're restricted on how much improvement stacking will make due to highly correlated predictions
+
+
+]
+
+.pull-right[
+
+```{r stacking-existing-mods-results, eval=FALSE}
+# base learners
+get_rmse <- function(model) {
+  results <- h2o.performance(model, newdata = test_h2o)
+  results@metrics$RMSE
+}
+
+list(best_glm, best_rf, best_gbm, best_xgb) %>%
+  purrr::map_dbl(get_rmse)
+## [1] 30024.67 23075.24 20859.92 21391.20
+
+# stacked glm
+results_tree <- h2o.performance(ensemble_tree, newdata = test_h2o)
+results_tree@metrics$RMSE
+## [1] 20664.56
+```
+
+```{r prediction-correlation, eval=FALSE}
+data.frame(
+  GLM_pred = as.vector(h2o.getFrame(best_glm@model$cross_validation_holdout_predictions_frame_id$name)),
+  RF_pred = as.vector(h2o.getFrame(best_rf@model$cross_validation_holdout_predictions_frame_id$name)),
+  GBM_pred = as.vector(h2o.getFrame(best_gbm@model$cross_validation_holdout_predictions_frame_id$name)),
+  XGB_pred = as.vector(h2o.getFrame(best_xgb@model$cross_validation_holdout_predictions_frame_id$name))
+  ) %>%
+  cor()
+##           GLM_pred   RF_pred  GBM_pred  XGB_pred
+## GLM_pred 1.0000000 0.9390229 0.9291982 0.9345048
+## RF_pred  0.9390229 1.0000000 0.9920349 0.9821944
+## GBM_pred 0.9291982 0.9920349 1.0000000 0.9854160
+## XGB_pred 0.9345048 0.9821944 0.9854160 1.0000000
+```
+
+]
+]
+
+---
+class: clear, center, middle, inverse
+
+.font300.white[Stacking a Grid Search]
+
+---
+# Stacking a grid search
+
+.scrollable90[
+.pull-left[
+* We can also stack multiple models generated from the same base learner
+
+* Certain tuning parameters allow us to find unique patterns within the data
+
+* By stacking the results of a grid search, we can capitalize on the benefits of each of the models in our grid search to create a meta model
+
+* For example, the following performs a random grid search across a wide range of hyperparameter settings. We set the search to stop after 25 models have run.
+]
+
+.pull-right[
+
+```{r gbm-grid-search, eval=FALSE}
+# GBM hyperparameters
+hyper_grid <- list(
+  max_depth = c(1, 3, 5),
+  min_rows = c(1, 5, 10),
+  learn_rate = c(0.01, 0.05, 0.1),
+  learn_rate_annealing = c(.99, 1),
+  sample_rate = c(.5, .75, 1),
+  col_sample_rate = c(.8, .9, 1)
+)
+
+# random grid search criteria
+search_criteria <- list(
+  strategy = "RandomDiscrete",
+  max_models = 25
+  )
+
+# build random grid search 
+random_grid <- h2o.grid(
+  algorithm = "gbm",
+  grid_id = "gbm_grid",
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  hyper_params = hyper_grid,
+  search_criteria = search_criteria,
+  ntrees = 5000,
+  stopping_metric = "RMSE",     
+  stopping_rounds = 10,         
+  stopping_tolerance = 0,
+  nfolds = 10,
+  fold_assignment = "Modulo",
+  keep_cross_validation_predictions = TRUE,
+  seed = 123
+  )
+```
+
+]]
+
+---
+# Stacking a grid search
+
+If we look at the grid search models we see that the cross-validated RMSE range from 20756-57826
+.scrollable90[
+```{r gbm-grid-results, eval=FALSE}
+# collect the results and sort by our model performance metric of choice
+random_grid_perf <- h2o.getGrid(
+  grid_id = "gbm_grid", 
+  sort_by = "rmse"
+  )
+random_grid_perf
+## H2O Grid Details
+## ================
+## 
+## Grid ID: gbm_grid 
+## Used hyper parameters: 
+##   -  col_sample_rate 
+##   -  learn_rate 
+##   -  learn_rate_annealing 
+##   -  max_depth 
+##   -  min_rows 
+##   -  sample_rate 
+## Number of models: 25 
+## Number of failed models: 0 
+## 
+## Hyper-Parameter Search Summary: ordered by increasing rmse
+##   col_sample_rate learn_rate learn_rate_annealing max_depth min_rows sample_rate         model_ids               rmse
+## 1             0.9       0.01                  1.0         3      1.0         1.0 gbm_grid_model_20  20756.16775065606
+## 2             0.9       0.01                  1.0         5      1.0        0.75  gbm_grid_model_2 21188.696088824694
+## 3             0.9        0.1                  1.0         3      1.0        0.75  gbm_grid_model_5 21203.753908665003
+## 4             0.8       0.01                  1.0         5      5.0         1.0 gbm_grid_model_16 21704.257699437963
+## 5             1.0        0.1                 0.99         3      1.0         1.0 gbm_grid_model_17 21710.275753497197
+## 
+## ---
+##    col_sample_rate learn_rate learn_rate_annealing max_depth min_rows sample_rate         model_ids               rmse
+## 20             1.0       0.01                  1.0         1     10.0        0.75 gbm_grid_model_11 26164.879525289896
+## 21             0.8       0.01                 0.99         3      1.0        0.75 gbm_grid_model_15  44805.63843296435
+## 22             1.0       0.01                 0.99         3     10.0         1.0 gbm_grid_model_18 44854.611500840605
+## 23             0.8       0.01                 0.99         1     10.0         1.0 gbm_grid_model_21 57797.874642563846
+## 24             0.9       0.01                 0.99         1     10.0        0.75 gbm_grid_model_10  57809.60302408739
+## 25             0.8       0.01                 0.99         1      5.0        0.75  gbm_grid_model_4  57826.30370545089
+```
+]
+
+---
+# Stacking a grid search
+
+.scrollable90[
+.pull-left[
+
+Single best model applied to our test set
+
+```{r gbm-grid-single-best, eval=FALSE}
+# Grab the model_id for the top model, chosen by validation error
+best_model_id <- random_grid_perf@model_ids[[1]]
+best_model <- h2o.getModel(best_model_id)
+h2o.performance(best_model, newdata = test_h2o)
+## H2ORegressionMetrics: gbm
+## 
+## MSE:  466551295
+## RMSE:  21599.8 #<<
+## MAE:  13697.78
+## RMSLE:  0.1090604
+## Mean Residual Deviance :  466551295
+```
+
+]
+
+.pull-right[
+
+Meta learner of our grid search applied to our test set
+
+```{r gbm-grid-super-learner, eval=FALSE}
+# Train a stacked ensemble using the GBM grid
+ensemble <- h2o.stackedEnsemble(
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  model_id = "ensemble_gbm_grid",
+  base_models = random_grid@model_ids,
+  metalearner_algorithm = "gbm"
+  )
+
+# Eval ensemble performance on a test set
+h2o.performance(ensemble, newdata = test_h2o)
+## H2ORegressionMetrics: stackedensemble
+## 
+## MSE:  469579433
+## RMSE:  21669.78 #<<
+## MAE:  13499.93
+## RMSLE:  0.1061244
+## Mean Residual Deviance :  469579433
+```
+
+]]
+
+.center.bold.blue[We see little benefit here; likely because our predictions are highly correlated.]
+
+---
+class: clear, center, middle, inverse
+
+.font300.white[Auto ML Search]
+
+---
+# Auto ML search
+
+.pull-left[
+
+* Perform an automated search across
+   - multiple base learners
+   - multiple hyperparameter settings
+
+* Frees your time
+
+* Multiple players
+   - DataRobot, a current leader in AutoML (R and Python interfaces are available).
+   - H2O Driverless AI, another leader in AutoML (R and Python interfaces available).
+   - auto-sklearn, an automated machine learning toolkit and a drop-in replacement for scikit-learn estimator’s (Python).
+
+]
+
+.pull-right[
+
+```{r autoML-cartoon, eval=TRUE, echo=FALSE}
+knitr::include_graphics("images/autoML-cartoon.png")
+```
+
+]
+
+---
+# Auto ML search
+
+.scrollable90[
+.pull-left[
+* `h2o.automl()` performs automated grid search and cross validation on
+   - GLMs
+   - RF
+   - GBM
+   - XGBoost
+   - Deep Learning
+   - Stacked results
+   
+* Default will search for 1 hour but you can adjust search to run for specified:
+   - time
+   - number of models
+   - and control individual model stopping tolerance
+   
+* This Auto ML search:
+   - assessed 80 models in 2 hours
+   - good results but not as good as our previous models
+   - use auto ML to point in good directions but don't rely on it as crème de la crème
+   
+]
+
+.pull-right[
+
+```{r autoML-search, eval=FALSE}
+auto_ml <- h2o.automl(
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  nfolds = 5,
+  max_runtime_secs = 60*120, # 2 hours!
+  keep_cross_validation_predictions = TRUE,
+  sort_metric = "RMSE",
+  seed = 123,
+  stopping_rounds = 50,
+  stopping_metric = "RMSE",
+  stopping_tolerance = 0
+)
+
+# assess the leader board
+# get top model: auto_ml@leader
+auto_ml@leaderboard %>% as.data.frame()
+##                                               model_id mean_residual_deviance      rmse         mse      mae     rmsle
+## 1                     XGBoost_1_AutoML_20190220_084553              494171636  22229.97   494171636 13822.87 0.1278834
+## 2            GBM_grid_1_AutoML_20190220_084553_model_1              503430766  22437.26   503430766 13767.88 0.1253053
+## 3            GBM_grid_1_AutoML_20190220_084553_model_3              518817574  22777.57   518817574 13858.60 0.1290617
+## 4                         GBM_2_AutoML_20190220_084553              519183630  22785.60   519183630 14224.31 0.1280925
+## 5                         GBM_3_AutoML_20190220_084553              535163213  23133.59   535163213 14220.94 0.1291349
+## 6                         GBM_4_AutoML_20190220_084553              537565303  23185.45   537565303 14217.37 0.1288148
+## 7                     XGBoost_2_AutoML_20190220_084553              538225152  23199.68   538225152 14219.07 0.1309783
+## 8                     XGBoost_1_AutoML_20190220_075753              539692588  23231.28   539692588 14579.98 0.1336797
+## 9                         GBM_1_AutoML_20190220_084553              544128711  23326.57   544128711 14261.71 0.1303192
+## 10           GBM_grid_1_AutoML_20190220_075753_model_2              544308592  23330.42   544308592 14096.86 0.1285264
+## 11                    XGBoost_3_AutoML_20190220_084553              551086335  23475.23   551086335 14281.41 0.1329799
+## 12       XGBoost_grid_1_AutoML_20190220_084553_model_3              554604150  23550.04   554604150 14450.80 0.1323416
+## 13      XGBoost_grid_1_AutoML_20190220_075753_model_15              558894714  23640.95   558894714 14623.96 0.1371709
+## 14       XGBoost_grid_1_AutoML_20190220_084553_model_8              559164350  23646.66   559164350 14471.03 0.1352374
+## 15       XGBoost_grid_1_AutoML_20190220_084553_model_6              560854881  23682.37   560854881 14659.27 0.1389242
+## 16      XGBoost_grid_1_AutoML_20190220_084553_model_12              561541549  23696.87   561541549 14517.76 0.1319543
+## 17                        GBM_1_AutoML_20190220_075753              564388242  23756.86   564388242 14553.10 0.1325419
+## 18       XGBoost_grid_1_AutoML_20190220_084553_model_7              566710386  23805.68   566710386 14221.74 0.1317049
+## 19       XGBoost_grid_1_AutoML_20190220_075753_model_6              569618396  23866.68   569618396 14791.46 0.1396311
+## 20           GBM_grid_1_AutoML_20190220_084553_model_2              573869609  23955.58   573869609 13675.43 0.1259909
+## 21                        GBM_2_AutoML_20190220_075753              575416124  23987.83   575416124 14514.53 0.1309590
+## 22       XGBoost_grid_1_AutoML_20190220_075753_model_8              590222063  24294.49   590222063 14677.83 0.1371388
+## 23                        GBM_3_AutoML_20190220_075753              591347916  24317.65   591347916 14548.26 0.1317904
+## 24                        GBM_5_AutoML_20190220_084553              592751585  24346.49   592751585 15167.43 0.1354277
+## 25       XGBoost_grid_1_AutoML_20190220_084553_model_9              593645832  24364.85   593645832 14409.93 0.1347822
+## 26                        GBM_4_AutoML_20190220_075753              593842616  24368.89   593842616 14539.17 0.1312543
+## 27      XGBoost_grid_1_AutoML_20190220_075753_model_14              595847877  24410.00   595847877 15102.16 0.1412699
+## 28                    XGBoost_2_AutoML_20190220_075753              597183621  24437.34   597183621 14774.69 0.1350752
+## 29                    XGBoost_3_AutoML_20190220_075753              618364439  24866.93   618364439 14627.21 0.1362630
+## 30      XGBoost_grid_1_AutoML_20190220_075753_model_12              618668364  24873.04   618668364 14962.68 0.1343198
+## 31       XGBoost_grid_1_AutoML_20190220_075753_model_7              623752476  24975.04   623752476 15002.37 0.1376980
+## 32      XGBoost_grid_1_AutoML_20190220_075753_model_13              625612063  25012.24   625612063 15250.60 0.1410862
+## 33       XGBoost_grid_1_AutoML_20190220_075753_model_2              631028689  25120.28   631028689 15311.83 0.1373562
+## 34       XGBoost_grid_1_AutoML_20190220_075753_model_9              639355245  25285.47   639355245 14589.69 0.1368971
+## 35       XGBoost_grid_1_AutoML_20190220_084553_model_4              644708584  25391.11   644708584 15545.27 0.1455432
+## 36                        DRF_1_AutoML_20190220_084553              651375000  25522.05   651375000 15286.66 0.1413668
+## 37  DeepLearning_grid_1_AutoML_20190220_084553_model_1              652899521  25551.90   652899521 14924.34 0.1686744
+## 38       XGBoost_grid_1_AutoML_20190220_084553_model_1              666911878  25824.64   666911878 15785.05 0.1448420
+## 39      XGBoost_grid_1_AutoML_20190220_084553_model_11              669644295  25877.49   669644295 15973.13 0.1460775
+## 40       XGBoost_grid_1_AutoML_20190220_075753_model_5              670032753  25884.99   670032753 15827.29 0.1444645
+## 41       XGBoost_grid_1_AutoML_20190220_084553_model_5              673877787  25959.16   673877787 15890.51 0.1442607
+## 42      XGBoost_grid_1_AutoML_20190220_075753_model_11              674002846  25961.56   674002846 15994.60 0.1459860
+## 43       XGBoost_grid_1_AutoML_20190220_075753_model_1              679742125  26071.86   679742125 15878.26 0.1455838
+## 44  DeepLearning_grid_1_AutoML_20190220_075753_model_2              683895191  26151.39   683895191 15371.53 0.1378527
+## 45       XGBoost_grid_1_AutoML_20190220_084553_model_2              693546595  26335.27   693546595 16835.52 0.1434459
+## 46       XGBoost_grid_1_AutoML_20190220_075753_model_3              712715861  26696.74   712715861 15755.10 0.1408707
+## 47                        XRT_1_AutoML_20190220_084553              715885103  26756.03   715885103 16134.13 0.1506908
+## 48      XGBoost_grid_1_AutoML_20190220_075753_model_16              716643971  26770.21   716643971 15652.50 0.1360591
+## 49                        DRF_1_AutoML_20190220_075753              718590439  26806.54   718590439 16441.92 0.1470079
+## 50  DeepLearning_grid_1_AutoML_20190220_075753_model_3              720915166  26849.86   720915166 14959.75 0.1501482
+## 51  DeepLearning_grid_1_AutoML_20190220_075753_model_6              753480062  27449.59   753480062 15026.75 0.1344080
+## 52           GBM_grid_1_AutoML_20190220_075753_model_1              754219556  27463.06   754219556 18038.62 0.1519872
+## 53  DeepLearning_grid_1_AutoML_20190220_084553_model_2              755131890  27479.66   755131890 16007.82 0.1397099
+## 54           GBM_grid_1_AutoML_20190220_075753_model_7              764119160  27642.71   764119160 18469.07 0.1565801
+## 55                        GBM_5_AutoML_20190220_075753              774950440  27837.93   774950440 16288.80 0.1435441
+## 56  DeepLearning_grid_1_AutoML_20190220_075753_model_5              776388379  27863.75   776388379 15576.71 0.1358005
+## 57               DeepLearning_1_AutoML_20190220_084553              805890899  28388.22   805890899 15329.34 0.1428664
+## 58  DeepLearning_grid_1_AutoML_20190220_075753_model_1              813465684  28521.32   813465684 14933.25 0.1478771
+## 59           GBM_grid_1_AutoML_20190220_075753_model_4              843074198  29035.74   843074198 18032.57 0.1638802
+## 60      XGBoost_grid_1_AutoML_20190220_084553_model_10              858324912  29297.18   858324912 16341.85 0.1386949
+## 61                        XRT_1_AutoML_20190220_075753              873499767  29555.03   873499767 17548.96 0.1595296
+## 62               DeepLearning_1_AutoML_20190220_075753              874287980  29568.36   874287980 16888.83 0.1502274
+## 63           GBM_grid_1_AutoML_20190220_084553_model_4              957689400  30946.56   957689400 19817.20 0.1785158
+## 64  DeepLearning_grid_1_AutoML_20190220_075753_model_4             1080202776  32866.44  1080202776 19627.77 0.1761614
+## 65           GBM_grid_1_AutoML_20190220_084553_model_5             1154050429  33971.32  1154050429 22031.69 0.1813508
+## 66           GBM_grid_1_AutoML_20190220_075753_model_8             1189517985  34489.39  1189517985 23847.28        NA
+## 67  DeepLearning_grid_1_AutoML_20190220_084553_model_3             1338954960  36591.73  1338954960 26890.09 0.2390289
+## 68           GBM_grid_1_AutoML_20190220_075753_model_6             1344509600  36667.56  1344509600 26568.92 0.2250109
+## 69      XGBoost_grid_1_AutoML_20190220_084553_model_13             1633478745  40416.32  1633478745 30366.55 0.2074675
+## 70           GBM_grid_1_AutoML_20190220_075753_model_9             2279530122  47744.43  2279530122 34931.67        NA
+## 71    StackedEnsemble_AllModels_AutoML_20190220_084553             2485686253  49856.66  2485686253 35106.78 0.2722184
+## 72    StackedEnsemble_AllModels_AutoML_20190220_075753             3496013158  59127.09  3496013158 42268.32 0.3167804
+## 73 StackedEnsemble_BestOfFamily_AutoML_20190220_084553             5885176593  76714.90  5885176593 55812.19 0.4030877
+## 74 StackedEnsemble_BestOfFamily_AutoML_20190220_075753             5890317586  76748.40  5890317586 55813.43 0.4032120
+## 75           GBM_grid_1_AutoML_20190220_075753_model_5             6156796280  78465.26  6156796280 57096.84 0.4119697
+## 76           GBM_grid_1_AutoML_20190220_075753_model_3             6167799467  78535.34  6167799467 57115.15 0.4121815
+## 77           GLM_grid_1_AutoML_20190220_075753_model_1             6445574649  80284.34  6445574649 58500.33 0.4212456
+## 78           GLM_grid_1_AutoML_20190220_084553_model_1             6445574649  80284.34  6445574649 58500.33 0.4212456
+## 79       XGBoost_grid_1_AutoML_20190220_075753_model_4             8567249418  92559.44  8567249418 48730.19 5.1997830
+## 80      XGBoost_grid_1_AutoML_20190220_075753_model_10            15721368661 125384.88 15721368661 81968.35 7.3465085
+```
+
+]]
+
+---
+# Summary
+
+<br>
+.pull-left[
+* Multiple approaches for model stacking
+  - Stacking existing models
+  - Stacking a grid search
+  
+* Multiple applications for model stacking
+  - H2O
+  - DataRobot
+  - auto-sklearn
+  
+* Auto ML frees up your time but .bold.blue[is not a panacea]! 
+]
+
+.pull-right[
+
+```{r panacea-image, echo=FALSE, eval=TRUE}
+knitr::include_graphics("images/automl-panacea.jpg")
+```
+
+
+]
+
+---
+class: clear, center, middle
+
+background-image: url(https://slideplayer.com/slide/8645270/26/images/8/Good+vrs.+Bad+No+question+is+a+bad+question.+Well%2C+for+teachers+this+is+not+the+case%21%21.jpg)
+background-size: contain
+
+---
+# Back home
+
+<br><br><br><br>
+[.center[`r anicon::faa("home", size = 10, animate = FALSE)`]](https://github.com/koalaverse/AnalyticsSummit19)
+
+.center[https://github.com/koalaverse/AnalyticsSummit19]
+
+
+
+
+
+

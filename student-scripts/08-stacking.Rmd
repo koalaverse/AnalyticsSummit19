@@ -1,0 +1,308 @@
+---
+title: "Model Stacking and Auto ML"
+output: html_notebook
+---
+
+
+## Prerequisites
+
+```{r slide-3}
+library(recipes)
+library(h2o)
+h2o.init(max_mem_size = "5g")
+
+# data prep
+# ames data
+ames <- AmesHousing::make_ames()
+
+# split data
+set.seed(123)
+split <- rsample::initial_split(ames, strata = "Sale_Price")
+ames_train <- rsample::training(split)
+ames_test <- rsample::testing(split)
+
+# make sure we have consistent categorical levels
+blueprint <- recipe(Sale_Price ~ ., data = ames_train) %>%
+  step_other(all_nominal(), threshold = .005)
+
+# create training & test sets
+train_h2o <- prep(blueprint, training = ames_train, retain = TRUE) %>%
+  juice() %>%
+  as.h2o()
+
+test_h2o <- prep(blueprint, training = ames_train) %>%
+  bake(new_data = ames_test) %>%
+  as.h2o()
+
+# get names of response and features
+Y <- "Sale_Price"
+X <- setdiff(names(ames_train), Y)
+
+```
+
+## Stacking existing models
+
+Say we found the optimal hyperparameters that provided the best predictive accuracy for a:
+
+1. Regularized regression base learner
+2. Random forest base learner
+3. Stochastic GBM base learner
+4. XGBoost base learner
+
+To stack them later we need to do a few specific things:
+
+1. All models must be trained on the same training set.
+2. All models must be trained with the same number of CV folds.
+3. All models must use the same fold assignment to ensure the same observations are used (`fold_assignment = "Modulo"`).
+4. The cross-validated predictions from all of the models must be preserved (`keep_cross_validation_predictions = True`).
+
+```{r slide-12}
+# Train & Cross-validate a GLM model
+best_glm <- h2o.glm(
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  alpha = .1,
+  remove_collinear_columns = TRUE,
+  nfolds = 10, 
+  fold_assignment = "Modulo", 
+  keep_cross_validation_predictions = TRUE, 
+  seed = 123
+  )
+
+h2o.rmse(best_glm, xval = TRUE)
+
+# Train & Cross-validate a RF model
+best_rf <- h2o.randomForest(
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  ntrees = 1000,
+  mtries = 20,
+  max_depth = 30,
+  min_rows = 1,
+  sample_rate = 0.8,
+  nfolds = 10, 
+  fold_assignment = "Modulo", 
+  keep_cross_validation_predictions = TRUE, 
+  seed = 123,
+  stopping_rounds = 50,
+  stopping_metric = "RMSE",
+  stopping_tolerance = 0
+  )
+
+h2o.rmse(best_rf, xval = TRUE)
+
+# Train & Cross-validate a GBM model
+best_gbm <- h2o.gbm(
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  ntrees = 5000,
+  learn_rate = 0.01,
+  max_depth = 7,
+  min_rows = 5,
+  sample_rate = 0.8,
+  nfolds = 10, 
+  fold_assignment = "Modulo", 
+  keep_cross_validation_predictions = TRUE, 
+  seed = 123,
+  stopping_rounds = 50,
+  stopping_metric = "RMSE",
+  stopping_tolerance = 0
+  )
+
+h2o.rmse(best_gbm, xval = TRUE)
+
+# Train & Cross-validate an XGBoost model
+best_xgb <- h2o.xgboost(
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  ntrees = 5000,
+  learn_rate = 0.05,
+  max_depth = 3,
+  min_rows = 3,
+  sample_rate = 0.8,
+  categorical_encoding = "Enum",
+  nfolds = 10,
+  fold_assignment = "Modulo", 
+  keep_cross_validation_predictions = TRUE, 
+  seed = 123,
+  stopping_rounds = 50,
+  stopping_metric = "RMSE",
+  stopping_tolerance = 0
+)
+
+h2o.rmse(best_xgb, xval = TRUE)
+```
+
+* use `h2o.stackedEnsemble()` to stack these models
+
+* we can use many different metalearning algorithms ("superlearners")
+   - `glm`: regularized linear regression
+   - `drf`: random forest
+   - `gbm`: gradient boosted machine
+   - `deeplearning`: neural network
+   
+* results illustrate a slight improvement
+
+```{r slide-13}
+ensemble_tree <- h2o.stackedEnsemble(
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  model_id = "my_tree_ensemble",
+  base_models = list(best_glm, best_rf, best_gbm, best_xgb),
+  metalearner_algorithm = "drf"
+  )
+```
+
+```{r slide-14a}
+# base learners
+get_rmse <- function(model) {
+  results <- h2o.performance(model, newdata = test_h2o)
+  results@metrics$RMSE
+}
+list(best_glm, best_rf, best_gbm, best_xgb) %>%
+  purrr::map_dbl(get_rmse)
+
+# stacked glm
+results_tree <- h2o.performance(ensemble_tree, newdata = test_h2o)
+results_tree@metrics$RMSE
+```
+
+
+We're restricted on how much improvement stacking will make due to highly correlated predictions
+
+```{r slide-14b}
+data.frame(
+  GLM_pred = as.vector(h2o.getFrame(best_glm@model$cross_validation_holdout_predictions_frame_id$name)),
+  RF_pred = as.vector(h2o.getFrame(best_rf@model$cross_validation_holdout_predictions_frame_id$name)),
+  GBM_pred = as.vector(h2o.getFrame(best_gbm@model$cross_validation_holdout_predictions_frame_id$name)),
+  XGB_pred = as.vector(h2o.getFrame(best_xgb@model$cross_validation_holdout_predictions_frame_id$name))
+  ) %>%
+  cor()
+```
+
+## Stacking a grid search
+
+* We can also stack multiple models generated from the same base learner
+
+* Certain tuning parameters allow us to find unique patterns within the data
+
+* By stacking the results of a grid search, we can capitalize on the benefits of each of the models in our grid search to create a meta model
+
+* For example, the following performs a random grid search across a wide range of hyperparameter settings. We set the search to stop after 25 models have run.
+
+```{r slide-16}
+# GBM hyperparameters
+hyper_grid <- list(
+  max_depth = c(1, 3, 5),
+  min_rows = c(1, 5, 10),
+  learn_rate = c(0.01, 0.05, 0.1),
+  learn_rate_annealing = c(.99, 1),
+  sample_rate = c(.5, .75, 1),
+  col_sample_rate = c(.8, .9, 1)
+)
+
+# random grid search criteria
+search_criteria <- list(
+  strategy = "RandomDiscrete",
+  max_models = 25
+  )
+
+# build random grid search 
+random_grid <- h2o.grid(
+  algorithm = "gbm",
+  grid_id = "gbm_grid",
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  hyper_params = hyper_grid,
+  search_criteria = search_criteria,
+  ntrees = 5000,
+  stopping_metric = "RMSE",     
+  stopping_rounds = 10,         
+  stopping_tolerance = 0,
+  nfolds = 10,
+  fold_assignment = "Modulo",
+  keep_cross_validation_predictions = TRUE,
+  seed = 123
+  )
+
+# collect the results and sort by our model performance metric of choice
+random_grid_perf <- h2o.getGrid(
+  grid_id = "gbm_grid", 
+  sort_by = "rmse"
+  )
+random_grid_perf
+```
+
+Single best model applied to our test set:
+
+```{r slide-18a}
+# Grab the model_id for the top model, chosen by validation error
+best_model_id <- random_grid_perf@model_ids[[1]]
+best_model <- h2o.getModel(best_model_id)
+h2o.performance(best_model, newdata = test_h2o)
+```
+
+Meta learner of our grid search applied to our test set:
+
+```{r slide-18b}
+# Train a stacked ensemble using the GBM grid
+ensemble <- h2o.stackedEnsemble(
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  model_id = "ensemble_gbm_grid",
+  base_models = random_grid@model_ids,
+  metalearner_algorithm = "gbm"
+  )
+
+# Eval ensemble performance on a test set
+h2o.performance(ensemble, newdata = test_h2o)
+```
+
+## Auto ML
+
+* `h2o.automl()` performs automated grid search and cross validation on
+   - GLMs
+   - RF
+   - GBM
+   - XGBoost
+   - Deep Learning
+   - Stacked results
+   
+* Default will search for 1 hour but you can adjust search to run for specified:
+   - time
+   - number of models
+   - and control individual model stopping tolerance
+   
+* This Auto ML search:
+   - assessed 80 models in 2 hours
+   - good results but not as good as our previous models
+   - use auto ML to point in good directions but don't rely on it as crème de la crème
+   
+```{r slide-21}
+auto_ml <- h2o.automl(
+  x = X,
+  y = Y,
+  training_frame = train_h2o,
+  nfolds = 5,
+  max_runtime_secs = 60*120, # 2 hours!
+  keep_cross_validation_predictions = TRUE,
+  sort_metric = "RMSE",
+  seed = 123,
+  stopping_rounds = 50,
+  stopping_metric = "RMSE",
+  stopping_tolerance = 0
+)
+
+# assess the leader board
+# get top model: auto_ml@leader
+auto_ml@leaderboard %>% as.data.frame()
+```
+   
+   

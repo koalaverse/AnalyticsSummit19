@@ -26,15 +26,15 @@ in this training:
 **Day
 2**
 
-| Topic                                                                                 |     Time     |
-| :------------------------------------------------------------------------------------ | :----------: |
-| Recap & morning discussion                                                            | 8:30 - 9:00  |
-| [Tree-based methods](https://koalaverse.github.io/AnalyticsSummit19/09-Trees.html)    | 9:00 - 12:00 |
-| Lunch                                                                                 | 12:00 - 1:00 |
-| [Support vector machines](https://koalaverse.github.io/AnalyticsSummit19/08-SVM.html) | 1:00 - 2:30  |
-| [Stacked models & auto ML]()                                                          | 2:45 - 3:15  |
-| Kaggle competition                                                                    | 3:30 - 4:30  |
-| Q\&A                                                                                  | 4:30 - 5:00  |
+| Topic                                                                                       |     Time     |
+| :------------------------------------------------------------------------------------------ | :----------: |
+| Recap & morning discussion                                                                  | 8:30 - 9:00  |
+| [Tree-based methods](https://koalaverse.github.io/AnalyticsSummit19/09-Trees.html)          | 9:00 - 12:00 |
+| Lunch                                                                                       | 12:00 - 1:00 |
+| [Support vector machines](https://koalaverse.github.io/AnalyticsSummit19/08-SVM.html)       | 1:00 - 2:30  |
+| [Stacked models & auto ML](https://koalaverse.github.io/AnalyticsSummit19/10-stacking.html) | 2:45 - 3:15  |
+| Kaggle competition                                                                          | 3:30 - 4:30  |
+| Q\&A                                                                                        | 4:30 - 5:00  |
 
 ***Schedule is still being refined and is subject to change; however,
 the topics should remain the same.***
