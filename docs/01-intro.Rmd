@@ -106,7 +106,43 @@ knitr::include_graphics("images/name-tag.png")
 
 # About us
 
-Brandon Greenwell
+.pull-left[
+
+```{r name-tag-brandon, echo=FALSE}
+knitr::include_graphics("images/name-tag-brandon.jpg")
+```
+
+* [`r fontawesome::fa("globe", fill = "steelblue")`](https://bgreenwell.netlify.com/) https://bgreenwell.netlify.com/
+* [`r fontawesome::fa("github", fill = "steelblue")`](https://github.com/bgreenwell/) @bgreenwell
+* [`r fontawesome::fa("twitter", fill = "steelblue")`](https://twitter.com/bgreenwell8) @bgreenwell8
+* [`r fontawesome::fa("envelope", fill = "steelblue")`](mailto:greenwell.brandon@gmail.com) greenwell.brandon@gmail.com
+
+]
+
+
+.pull-right[
+
+<!-- #### Family <img src="images/family.png" align="right" alt="family" width="130" /> -->
+
+<!-- * Dayton, OH -->
+<!-- * Kate, Alivia (9), Jules (6) -->
+
+
+#### Professional 
+
+* 84.51° - Data Scientist <img src="images/logo8451.jpg" align="right" alt="family" width="150" />
+
+#### Academic
+
+* University of Cincinnati <img src="images/uc.png" align="right" alt="family" width="60" />
+
+* Wright State University <img src="images/wsu.jpg" align="right" alt="family" width="60" />
+
+#### R Community
+
+<img src="images/hexes-brandon.png" alt="family" width="400" />
+
+]
 
 
 ---
@@ -150,7 +186,7 @@ This workshop will step through the process of building, visualizing, testing, a
 ---
 # Course overview
 
-.font110[Moving from an machine learning apprentice to journeyman with `r anicon::faa("r-project", colour = "steelblue", size = 1, animate = FALSE)`:]
+.font110[Moving from a machine learning apprentice to journeyman with `r anicon::faa("r-project", colour = "steelblue", size = 1, animate = FALSE)`:]
 
 .font90[
 
@@ -326,7 +362,7 @@ This course uses several R `r emo::ji("package")` .  You should've ran the `00-r
 ###############################
 # the following packages will be used
 list_of_pkgs <- c(
-  'alr3',          # for Swiss banknote data
+  "alr3",          # for Swiss banknote data
   "AmesHousing",   # provides data we'll use
   "tidyverse",     # data munging & visualization
   "reshape2",      # data transformation for one example
