@@ -15,7 +15,7 @@ in this training:
 
 | Topic                                                                                                             |     Time      |
 | :---------------------------------------------------------------------------------------------------------------- | :-----------: |
-| [Getting started](https://koalaverse.github.io/AnalyticsSummit19/01-intro.html)                                   |  9:30 - 9:15  |
+| [Getting started](https://koalaverse.github.io/AnalyticsSummit19/01-intro.html)                                   |  8:30 - 9:15  |
 | [Supervised modeling process](https://koalaverse.github.io/AnalyticsSummit19/02-supervised-modeling-process.html) | 9:30 - 10:30  |
 | [Feature & target engineering](https://koalaverse.github.io/AnalyticsSummit19/03-engineering.html)                | 10:45 - 11:45 |
 | Lunch                                                                                                             | 12:00 - 1:00  |
@@ -33,7 +33,7 @@ in this training:
 | Lunch                                                                                       | 12:00 - 1:00 |
 | [Support vector machines](https://koalaverse.github.io/AnalyticsSummit19/08-SVM.html)       | 1:00 - 2:30  |
 | [Stacked models & auto ML](https://koalaverse.github.io/AnalyticsSummit19/10-stacking.html) | 2:45 - 3:15  |
-| Kaggle competition                                                                          | 3:30 - 4:30  |
+| [Kaggle competition](https://www.kaggle.com/t/c58df800271e467b8e1bf5e9ca105b40)             | 3:30 - 4:30  |
 | Q\&A                                                                                        | 4:30 - 5:00  |
 
 ***Schedule is still being refined and is subject to change; however,
