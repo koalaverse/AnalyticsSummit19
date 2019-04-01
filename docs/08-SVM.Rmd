@@ -4,7 +4,8 @@ author: "Bradley C. Boehmke </br> and </br> Brandon M. Greenwell"
 date: "April 2, 2019"
 output:
   xaringan::moon_reader:
-    css: ["default", "scrollable.css", "hygge"]
+    mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
+    css: ["default", "scrollable.css", "custom.css", "hygge"]
     lib_dir: libs
     chakra: libs/remark-latest.min.js
     nature:
@@ -20,9 +21,39 @@ background-position: center
 background-size: contain
 
 ---
-class: inverse, center, middle
+class: middle
 
-# Introduction
+
+.pull-left[
+
+.font125[
+
+The usual introduction...`r emo::ji("scream")`
+
+]
+
+```{r svm-pseudo-code, echo=FALSE, out.width="100%"}
+knitr::include_graphics("images/svm-pseudocode.jpg")
+```
+
+]
+
+.pull-right[
+
+```{r nope-nope, echo=FALSE, out.width="100%"}
+RBitmoji::plot_comic("8b06e67b-d4e9-4f11-a355-f1236df17079-v1", 
+                     tag = "nope nope")
+```
+
+]
+
+
+---
+class: center, middle
+
+## A gentle introduction...
+
+![](https://media.giphy.com/media/8OJdqYqN1Nii3UTD6l/giphy.gif)
 
 ```{r 08-setup, include=FALSE}
 # Set global R options
@@ -75,6 +106,20 @@ plot_svmpath <- function(x, step = max(x$Step), main = "") {
          col = "black", lwd = 1, lty = 2)
   points(x[Elbow, ], pch = 19, cex = 1.2)
 }
+```
+
+
+---
+class: center, middle
+
+.font150[
+
+Classification is all about finding a "good" [_decision boundary_](https://en.wikipedia.org/wiki/Decision_boundary)
+
+]
+
+```{r decision-boundaries, echo=FALSE, out.width="100%"}
+knitr::include_graphics("images/decision_boundaries.png")
 ```
 
 
@@ -582,7 +627,7 @@ text(1.5, -2.25, label = "M", col = set1[1L], srt = 40)
 
 ---
 
-## The hard margin classifier
+## The hard margin classifier `r emo::ji("scream")`
 
 <br/>
 
@@ -607,6 +652,23 @@ class: inverse, center, middle
 
 ---
 
+```{r 08-plot-again, echo=FALSE, fig.width=4, fig.height=4, out.width="80%"}
+# Scatterplot
+plot(
+  formula = x2 ~ x1, 
+  data = norm2d, 
+  asp = 1,
+  cex = 1.2,
+  pch = c(17, 19)[norm2d$y],
+  col = adjustcolor(dark2[norm2d$y], alpha.f = 0.5),
+  xlab = "Income (standardized)",
+  ylab = "Lot size (standardized)"
+)
+```
+
+
+---
+
 ```{r 08-noisy-01, echo=FALSE, fig.width=4, fig.height=4, out.width="80%"}
 # Add an outlier
 norm2d <- rbind(norm2d, data.frame("x1" = 0.5, "x2" = 1, "y" = 2))
@@ -624,8 +686,8 @@ plot(
 )
 
 # Add an arrow pointing to the outlier
-arrows(-1, 4, 0.5, 1)
-text(-1, 4, label = "Outlier?", pos = 3)
+arrows(x0 = -1, y0 = 4, x1 = 0.5, y1 = 1, length = 0.1)
+text(x = -1, y = 4, label = "Outlier?", pos = 3)
 ```
 
 
@@ -725,11 +787,11 @@ legend(
 
 ---
 
-## The soft margin classifier
+## The soft margin classifier `r emo::ji("scream")`
 
 <br/>
 
-.large[
+.font125[
 
 $$\underset{\beta_0, \beta_1, \dots, \beta_p}{\text{maximize}} \quad M$$
 
@@ -1296,6 +1358,8 @@ Image credit: [imgflip](http://www.learntoplaymusic.com/blog/tune-guitar/)
 
 ## Using caret::getModelInfo()
 
+.code80[
+
 ```{r 08-getModelInfo}
 # Linear (i.e., ordinary inner product)
 caret::getModelInfo("svmLinear")$svmLinear$parameters
@@ -1306,6 +1370,8 @@ caret::getModelInfo("svmPoly")$svmPoly$parameters
 # Radial basis kernel
 caret::getModelInfo("svmRadial")$svmRadial$parameters
 ```
+
+]
 
 
 ---
@@ -1325,6 +1391,8 @@ detach(package:purrr)
 ---
 
 ## Job attrition example
+
+.code80[
 
 ```{r 08-attrition-01}
 # Load required packages
@@ -1351,6 +1419,8 @@ trn <- training(split)
 tst <- testing(split)
 ```
 
+]
+
 
 ---
 class: center, middle
@@ -1367,6 +1437,8 @@ RBitmoji::plot_comic(user_id, tag = "cereal")
 ---
 
 ## Job attrition example
+
+.code80[
 
 ```{r 08-attrition-02}
 # Control params for SVM
@@ -1387,11 +1459,13 @@ attr_svm <- train(
   metric = "ROC",                     #<<
   trControl = ctrl,
   tuneGrid = data.frame(
-    sigma = 0.008071434, 
+    sigma = 0.008071434,              #<<
     C = seq(from = 0.1, to = 5, length = 30)
   )
 )
 ```
+
+]
 
 
 ---
@@ -1428,6 +1502,69 @@ plot(varImp(attr_svm))
 # Filter-based variable 
 # importance scores
 plot(varImp(attr_svm))
+```
+
+]
+
+
+---
+
+## Job attrition example
+
+.pull-left.code80[
+
+```{r svm-attrition-vip-permute-01, eval=FALSE}
+# Predicted probabilities
+prob_fun <- function(object, newdata) {
+  probs <- predict(
+    object = object, 
+    newdata = newdata, 
+    type = "prob"
+  )
+  probs[, c(2, 1)]  # ref class first
+}
+
+# Permutation-based importance
+vip::vip(
+  object = attr_svm, 
+  method = "permute", 
+  nsim = 10,
+  target = "Attrition", 
+  train = trn, 
+  metric = "auc", 
+  reference_class = "Yes",
+  pred_fun = prob_fun,
+  num_features = ncol(trn) - 1
+)
+```
+
+]
+
+.pull-right[
+
+```{r svm-attrition-vip-permute-02, echo=FALSE}
+# Predicted probabilities
+prob_fun <- function(object, newdata) {
+  probs <- predict(
+    object = object, 
+    newdata = newdata, 
+    type = "prob"
+  )
+  probs[, c(2, 1)]  # ref class first
+}
+
+# Permutation-based importance
+vip::vip(
+  object = attr_svm, 
+  method = "permute", 
+  nsim = 10,
+  target = "Attrition", 
+  train = trn, 
+  metric = "auc", 
+  reference_class = "Yes",
+  pred_fun = prob_fun,
+  num_features = ncol(trn) - 1
+)
 ```
 
 ]
@@ -1648,8 +1785,5 @@ knitr::include_graphics("images/svm-books.png")
 
 ---
 
-## Questions?
-
-.center[
-Insert clever Chuck Norris joke here!
-]
+background-image: url(images/questions-dr-evil.jpg)
+background-position: center
