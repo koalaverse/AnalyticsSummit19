@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
   <head>
     <title>Random Forests and Gradient Boosting Machines</title>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <meta name="author" content="Bradley C. Boehmke  and  Brandon M. Greenwell" />
     <meta name="date" content="2019-04-02" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
@@ -257,14 +257,14 @@ accuracy(
 .pull-left[
 
 Decision stump (test error = 1.53%):
-&lt;img src="09-Trees_files/figure-html/mushroom-tree-diagram-1-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/mushroom-tree-diagram-1-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 ]
 
 .pull-right[
 
 Optimal tree (test error = 0%):
-&lt;img src="09-Trees_files/figure-html/mushroom-tree-diagram-2-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/mushroom-tree-diagram-2-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -337,7 +337,7 @@ legend("bottomright", legend = c("Train", "Test"), bty = "n",
 ---
 class: center, middle
 
-&lt;img src="09-Trees_files/figure-html/mushroom-cart-roc-02-1.svg" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/mushroom-cart-roc-02-1.svg" width="80%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -400,7 +400,7 @@ pred &lt;- predict(spam_tree, newdata = xtst, type = "class")
 
 .scrollable[
 
-&lt;img src="09-Trees_files/figure-html/spam-tree-diagram-1.svg" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/spam-tree-diagram-1.svg" width="70%" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -444,7 +444,7 @@ pred &lt;- predict(spam_tree, newdata = xtst, type = "class")
 *vip::vip(spam_tree, num_features = 10)
 ```
 
-&lt;img src="09-Trees_files/figure-html/spam-vip-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/spam-vip-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -571,28 +571,28 @@ Image credit: [Wikimedia Commons](https://commons.wikimedia.org/wiki/Forest#/med
 
 ## Bagging trees
 
-&lt;img src="09-Trees_files/figure-html/bagging-1-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/bagging-1-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
 
 
 ---
 
 ## Trees are step functions
 
-&lt;img src="09-Trees_files/figure-html/bagging-2-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/bagging-2-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
 
 
 ---
 
 ## Trees are noisy
 
-&lt;img src="09-Trees_files/figure-html/bagging-3-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/bagging-3-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
 
 
 ---
 
 ## Bagging reduces variance
 
-&lt;img src="09-Trees_files/figure-html/bagging-4-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/bagging-4-1.svg" width="65%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -600,13 +600,13 @@ class: center, middle
 
 .large[Remember this data set?]
 
-&lt;img src="09-Trees_files/figure-html/circle-01-1.svg" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/circle-01-1.svg" width="70%" style="display: block; margin: auto;" /&gt;
 
 
 ---
 class: center, middle
 
-&lt;img src="09-Trees_files/figure-html/circle-02-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/circle-02-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -637,7 +637,7 @@ spam_bag &lt;- randomForest(
 
 .pull-right[
 
-&lt;img src="09-Trees_files/figure-html/unnamed-chunk-3-1.svg" width="400" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/unnamed-chunk-3-1.svg" width="400" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -772,7 +772,7 @@ spam_rf &lt;- randomForest(
 
 .pull-right[
 
-&lt;img src="09-Trees_files/figure-html/unnamed-chunk-5-1.svg" width="400" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/unnamed-chunk-5-1.svg" width="400" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -851,7 +851,7 @@ mean(x %in% sample(x, replace = TRUE))  # non-OOB proportion
 
 ## Predicting email spam
 
-&lt;img src="09-Trees_files/figure-html/unnamed-chunk-6-1.svg" width="60%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/unnamed-chunk-6-1.svg" width="60%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -923,7 +923,7 @@ system.time(
 
 ```
 ##    user  system elapsed 
-##   6.640   0.133   6.773
+##   6.774   0.133   6.927
 ```
 
 ```
@@ -950,11 +950,11 @@ system.time(
 
 ```
 ##    user  system elapsed 
-##   6.809   0.228   1.112
+##   5.002   0.163   0.927
 ```
 
 ```
-## [1] 0.8928631
+## [1] 0.892634
 ```
 
 ]
@@ -1000,7 +1000,7 @@ par(mfrow = c(1, 2))  # side-by-side plots
 *varImpPlot(boston_rf)  # randomForest::varImpPlot()
 ```
 
-&lt;img src="09-Trees_files/figure-html/boston-rf-varImpPlot-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/boston-rf-varImpPlot-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1017,7 +1017,7 @@ p3 &lt;- vip(boston_ranger) + ggtitle("ranger")
 *grid.arrange(p1, p2, p3, ncol = 3)
 ```
 
-&lt;img src="09-Trees_files/figure-html/boston-rf-vip-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/boston-rf-vip-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1096,7 +1096,7 @@ p2 &lt;- pdp::partial(boston_ranger, pred.var = "rm", plot = TRUE)
 grid.arrange(p1, p2, p3, ncol = 3)
 ```
 
-&lt;img src="09-Trees_files/figure-html/boston-rf-pdps-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/boston-rf-pdps-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1139,7 +1139,7 @@ p3 &lt;- boston_ranger %&gt;%  # %&gt;% is automatically imported!
 grid.arrange(p1, p2, p3, ncol = 3)
 ```
 
-&lt;img src="09-Trees_files/figure-html/unnamed-chunk-12-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/unnamed-chunk-12-1.svg" width="100%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1151,7 +1151,7 @@ grid.arrange(p1, p2, p3, ncol = 3)
 
 ---
 
-&lt;img src="09-Trees_files/figure-html/mushroom-tree-diagram-3-1.svg" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/mushroom-tree-diagram-3-1.svg" width="80%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1213,7 +1213,7 @@ banknote_rf$confusion
 heatmap(1 - banknote_rf$proximity, col = viridis::plasma(256))
 ```
 
-&lt;img src="09-Trees_files/figure-html/heatmap-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/heatmap-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1244,7 +1244,7 @@ ggplot(outlyingness, aes(x = obs, y = out)) +
 
 .pull-right[
 
-&lt;img src="09-Trees_files/figure-html/outlier-plot-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/outlier-plot-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -1259,7 +1259,7 @@ ggplot(outlyingness, aes(x = obs, y = out)) +
 MDSplot(banknote_rf, fac = as.factor(banknote$Y), k = 2, cex = 1.5)
 ```
 
-&lt;img src="09-Trees_files/figure-html/MDS-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/MDS-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1372,7 +1372,7 @@ attr_rf  # test error ~ 16.36%
 vip(attr_rf)
 ```
 
-&lt;img src="09-Trees_files/figure-html/attrition-rf-01-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/attrition-rf-01-1.svg" style="display: block; margin: auto;" /&gt;
 
 ]
 
@@ -1563,7 +1563,7 @@ best_iter &lt;- gbm.perf(
 )
 ```
 
-&lt;img src="09-Trees_files/figure-html/boston_gbm_best-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/boston_gbm_best-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1588,7 +1588,7 @@ system.time(
 
 ```
 ##    user  system elapsed 
-## 111.068   0.280 111.523
+## 115.772   0.165 116.038
 ```
 
 ]
@@ -1611,7 +1611,7 @@ system.time(
 
 ```
 ##    user  system elapsed 
-##   0.448   0.001   0.450
+##   0.455   0.000   0.455
 ```
 
 ]
@@ -1627,7 +1627,7 @@ system.time(
 grid.arrange(autoplot(pd1), autoplot(pd2), ncol = 2)
 ```
 
-&lt;img src="09-Trees_files/figure-html/boston-pdps-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/boston-pdps-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1658,7 +1658,7 @@ ggplot(ames, aes(x = Sale_Price, y = Overall_Qual)) +
   theme_light() + theme(legend.position = "none")
 ```
 
-&lt;img src="09-Trees_files/figure-html/ames-densities-1.svg" width="70%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/ames-densities-1.svg" width="70%" style="display: block; margin: auto;" /&gt;
 
 **Source:** [Bradley Boehmke](https://github.com/bradleyboehmke)
 
@@ -1700,7 +1700,7 @@ ames_xgb_cv &lt;- xgb.cv(
 
 ---
 
-&lt;img src="09-Trees_files/figure-html/ames-xgboost-cv-plot-1.svg" width="80%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/ames-xgboost-cv-plot-1.svg" width="80%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1745,7 +1745,7 @@ p3 &lt;- vip(ames_xgb, feature_names = colnames(X), type = "Frequency")
 grid.arrange(p1, p2, p3, ncol = 3)
 ```
 
-&lt;img src="09-Trees_files/figure-html/xgboost-vip-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/xgboost-vip-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1756,10 +1756,10 @@ grid.arrange(p1, p2, p3, ncol = 3)
 ```r
 # By default, `vip()` plots the top 10 features
 vip(ames_xgb, feature_names = colnames(X), type = "Gain", 
-    num_features = nrow(X), bar = FALSE)
+    num_features = ncol(X), bar = FALSE)
 ```
 
-&lt;img src="09-Trees_files/figure-html/xgboost-vip-2-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/xgboost-vip-2-1.svg" width="50%" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1777,7 +1777,7 @@ p6 &lt;- autoplot(oq_ice, alpha = 0.1)
 grid.arrange(p4, p5, p6, ncol = 3)
 ```
 
-&lt;img src="09-Trees_files/figure-html/xgboost-pdp-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/xgboost-pdp-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1785,7 +1785,7 @@ grid.arrange(p4, p5, p6, ncol = 3)
 ## Ames housing data
 
 
-&lt;img src="09-Trees_files/figure-html/xgboost-pdp-vi-1.svg" style="display: block; margin: auto;" /&gt;
+&lt;img src="figures/xgboost-pdp-vi-1.svg" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -1839,6 +1839,7 @@ grid.arrange(p4, p5, p6, ncol = 3)
 
 &lt;img src="images/questions-trees.png" width="100%" style="display: block; margin: auto;" /&gt;
     </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="libs/remark-latest.min.js"></script>
 <script src="macros.js"></script>
 <script>var slideshow = remark.create({
@@ -1849,11 +1850,41 @@ grid.arrange(p4, p5, p6, ncol = 3)
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
 });
-(function() {
-  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
   if (!r) return;
   s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
   d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
 })();
 (function(time) {
   var d2 = function(number) {
@@ -1903,7 +1934,18 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
 
 <script>
 (function() {
-  var i, text, code, codes = document.getElementsByTagName('code');
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
   for (i = 0; i < codes.length;) {
     code = codes[i];
     if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
@@ -1917,14 +1959,15 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     }
     i++;
   }
-})();
+};
+slideshow._releaseMath(document);
 </script>
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
 (function () {
   var script = document.createElement('script');
   script.type = 'text/javascript';
-  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML';
   if (location.protocol !== 'file:' && /^https?:/.test(script.src))
     script.src  = script.src.replace(/^https?:/, '');
   document.getElementsByTagName('head')[0].appendChild(script);

@@ -4,6 +4,7 @@ author: "Bradley C. Boehmke </br> and </br> Brandon M. Greenwell"
 date: "April 2, 2019"
 output:
   xaringan::moon_reader:
+    mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
     css: ["default", "scrollable.css"]
     lib_dir: libs
     chakra: libs/remark-latest.min.js
@@ -1920,7 +1921,7 @@ grid.arrange(p1, p2, p3, ncol = 3)
 ```{r xgboost-vip-2, out.width="50%"}
 # By default, `vip()` plots the top 10 features
 vip(ames_xgb, feature_names = colnames(X), type = "Gain", 
-    num_features = nrow(X), bar = FALSE)
+    num_features = ncol(X), bar = FALSE)
 ```
 
 
