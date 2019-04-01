@@ -4,6 +4,7 @@ author: "Bradley C. Boehmke </br> and </br> Brandon M. Greenwell"
 date: "April 2, 2019"
 output:
   xaringan::moon_reader:
+    seal: false
     mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
     css: ["default", "scrollable.css", "custom.css", "hygge"]
     lib_dir: libs
@@ -14,11 +15,22 @@ output:
       countIncrementalSlides: false
       countdown: 60000
 ---
+class: inverse, center
+
+background-image: url(images/svm-smiley.png)
+background-position: center
+background-size: cover
+
+# Support vector machines
+
+
+---
 class: inverse, center, middle
 
 background-image: url(images/i_svm.jpg)
 background-position: center
 background-size: contain
+
 
 ---
 class: middle

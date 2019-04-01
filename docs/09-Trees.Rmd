@@ -1,9 +1,10 @@
 ---
-title: "Random Forests and Gradient Boosting Machines"
+title: "Tree-based methods"
 author: "Bradley C. Boehmke </br> and </br> Brandon M. Greenwell"
 date: "April 2, 2019"
 output:
   xaringan::moon_reader:
+    seal: false
     mathjax: "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_HTMLorMML"
     css: ["default", "scrollable.css"]
     lib_dir: libs
@@ -14,6 +15,16 @@ output:
       highlightLines: true
       countIncrementalSlides: false
       countdown: 60000
+---
+class: inverse, center, middle
+
+background-image: url(images/title_slide_trees.jpeg)
+background-position: center
+background-size: cover
+
+# Tree-based methods
+
+
 ---
 
 ## R package prerequisites
@@ -35,12 +46,13 @@ install.packages(
   "RColorBrewer",  # for nicer looking color palettes 
   "rpart",         # for binary recursive partioning (i.e., CART)
   "tibble",        # for nicer data frames
+  "vip",           # for variable importance plots
   "xaringan",      # for building this presentation
   "xgboost"        # for eXtreme Gradient Boosting
 )
 
 # Install required packages from GitHub
-devtools::install_github("koalaverse/vip")  # for variable importance plots
+# remotes::install_github("koalaverse/vip")  # for variable importance plots
 ```
 
 ]
