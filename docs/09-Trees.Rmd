@@ -26,6 +26,12 @@ background-size: cover
 
 
 ---
+class: center, middle
+
+## [Brad's intro to random forests](https://bradleyboehmke.github.io/random-forest-training/slides-source.html#1)
+
+
+---
 
 ## R package prerequisites
 
